@@ -18,6 +18,18 @@ const months = [
     "November",
     "December"
 ];
+let monthCounter = 0;
+
+function leftButtonClick(x)
+{
+    monthCounter = monthCounter - 1
+    if;
+}
+
+function rightButtonClick(x)
+{
+    monthCounter = monthCounter + 1;
+}
 
 function displayMonth(x)
 {
