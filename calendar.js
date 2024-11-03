@@ -1,4 +1,4 @@
-const emptyarray = Array.from({ length: 6 }, () => Array(7).fill(null));
+
 const months = [
     "January",
     "February",
@@ -70,14 +70,15 @@ function createCalendar() {
     return emptyarray; // Return the populated calendar
 }
 
-
+//document.getElementById(`calendarCell-${x}-${y}`).style.visibility = "hidden" 
 
 
 function displayCalendarDates(x, y) {
     
     const calendarArray = createCalendar(); // Assuming createCalendar is defined elsewhere
     const date = calendarArray[x][y];
-    const dateText = date ? date.getDate() : "No date";
+    const dateText = date ? date.getDate() :document.getElementById(`date-${x}-${y}`).style.visibility = "hidden"; // "No date";
+    
     console.log(calendarArray, x, y)
     const dateElement = document.getElementById(`date-${x}-${y}`);
     if (dateElement) {
