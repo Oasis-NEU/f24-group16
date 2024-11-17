@@ -1,4 +1,3 @@
-
 const months = [
     "January",
     "February",
@@ -13,91 +12,98 @@ const months = [
     "November",
     "December"
 ];
-const demo =[ ["hi"] ["hello"] ];
-let monthCounter = 0;
 
-function leftButtonClick(x)
-{
-    monthCounter = monthCounter - 1;
-}
+const anchorDate = new Date();
+let monthCounter = anchorDate.getMonth(); // Start with the current month
+let yearCounter = anchorDate.getFullYear(); // Start with the current year
 
-function rightButtonClick(x)
-{
-    monthCounter = monthCounter + 1;
-}
+function createCalendar(month, year) {
+    const emptyarray = Array.from({ length: 6 }, () => Array(7).fill(null)); // Create a 6x7 grid
+    const firstDayOfMonth = new Date(year, month, 1); // First day of the month
+    const startingDay = firstDayOfMonth.getDay(); // Day of the week for the 1st (0 = Sunday, ..., 6 = Saturday)
+    const daysInMonth = new Date(year, month + 1, 0).getDate(); // Total days in the current month
+    let dayCounter = 1; // Start counting days from the 1st of the month
 
-function displayMonth(x)
-{
-    if(monthCounter < 0)
-    {
-        monthCounter = monthCounter + 12;
-        return months[monthCounter];
-    }
-    else
-    {
-        return months[monthCounter];
-    }
-}
-
-
-function createCalendar() {
-    const emptyarray = Array.from({ length: 6 }, () => Array(7).fill(null)); // Create a 6x7 array initialized to null
-    const month = 9; // October (0-indexed, so 9 is October)
-    const year = 2024;
-
-    const firstDayOfMonth = new Date(year, month, 1); // Get the first day of the month
-    const startingDay = firstDayOfMonth.getDay(); // Get the day of the week (0=Sunday, 1=Monday, ..., 6=Saturday)
-
-    let dayCounter = 1; // Day counter to fill the calendar
-
-    for (let i = 0; i < 6; i++) { // For each week
-        for (let x = 0; x < 7; x++) { // For each day of the week
-            if (i === 0 && x < startingDay) {
-                emptyarray[i][x] = null; // Fill in the leading empty cells for the first week
-            } else if (dayCounter <= new Date(year, month + 1, 0).getDate()) { // Check if we are still in the month
-                if (dayCounter > 0) {
-                    let d = new Date(year, month, dayCounter);
-                    emptyarray[i][x] = d; // Assign the date to the array
-                    dayCounter++; // Increment the day counter
-                }
+    for (let i = 0; i < 6; i++) { // Loop over weeks
+        for (let j = 0; j < 7; j++) { // Loop over days in a week
+            if (i === 0 && j < startingDay) {
+                emptyarray[i][j] = null; // Empty leading days
+            } else if (dayCounter <= daysInMonth) {
+                emptyarray[i][j] = dayCounter; // Assign valid date
+                dayCounter++;
             } else {
-                emptyarray[i][x] = null; // Assign null if no valid date
+                emptyarray[i][j] = null; // Empty trailing days
             }
         }
     }
 
-    console.log(emptyarray); // For debugging
-    return emptyarray; // Return the populated calendar
+    return emptyarray;
 }
 
-//document.getElementById(`calendarCell-${x}-${y}`).style.visibility = "hidden" 
-
-
-function displayCalendarDates(x, y) {
-    
-    const calendarArray = createCalendar(); // Assuming createCalendar is defined elsewhere
-    const date = calendarArray[x][y];
-    const dateText = date ? date.getDate() :document.getElementById(`date-${x}-${y}`).style.visibility = "hidden"; // "No date";
-    
-    console.log(calendarArray, x, y)
-    const dateElement = document.getElementById(`date-${x}-${y}`);
-    if (dateElement) {
-      dateElement.innerHTML = dateText; // Update the element with the date
+function displayMonth() {
+    if (monthCounter < 0) {
+        monthCounter += 12;
+        yearCounter -= 1;
+    } else if (monthCounter > 11) {
+        monthCounter -= 12;
+        yearCounter += 1;
     }
-  }
+    return `${months[monthCounter]} ${yearCounter}`;
+}
 
-  document.addEventListener("DOMContentLoaded", function() {
-    const weeks = 6; // Number of rows/weeks in the calendar
-    const daysInWeek = 7; // Number of columns/days in a week
-    
-    for (let x = 0; x < weeks; x++) {
-      for (let y = 0; y < daysInWeek; y++) {
-        displayCalendarDates(x, y); // Call the function for each cell
-        console.log (displayCalendarDates(x, y));
-      }
+function updateCalendar() {
+    const calendarArray = createCalendar(monthCounter, yearCounter);
+    document.getElementById("current-month").textContent = displayMonth();
+
+    for (let week = 0; week < 6; week++) {
+        for (let day = 0; day < 7; day++) {
+            const dateElement = document.getElementById(`date-${week}-${day}`);
+            if (calendarArray[week][day] === null) {
+                dateElement.textContent = ""; // Empty cell
+                dateElement.parentElement.parentElement.style.visibility = "hidden"; // Hide the card
+            } else {
+                dateElement.textContent = calendarArray[week][day]; // Set date
+                dateElement.parentElement.parentElement.style.visibility = "visible"; // Show the card
+            }
+        }
     }
-  });
+}
 
+function generateCalendarGrid() {
+    const calendarGrid = document.getElementById("calendar-grid");
+    calendarGrid.innerHTML = "";
+    for (let week = 0; week < 6; week++) {
+        const weekRow = document.createElement("div");
+        weekRow.className = "row g-2";
+        for (let day = 0; day < 7; day++) {
+            const cell = document.createElement("div");
+            cell.className = "col";
+            cell.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title" id="date-${week}-${day}"></h5>
+                        <p class="card-text">- No events -</p>
+                    </div>
+                </div>
+            `;
+            weekRow.appendChild(cell);
+        }
+        calendarGrid.appendChild(weekRow);
+    }
+}
 
+function leftButtonClick() {
+    monthCounter--;
+    updateCalendar();
+}
 
+function rightButtonClick() {
+    monthCounter++;
+    updateCalendar();
+}
 
+// Initial Load
+document.addEventListener("DOMContentLoaded", () => {
+    generateCalendarGrid();
+    updateCalendar();
+});
