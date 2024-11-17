@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from datetime import datetime
+from flask import Flask, jsonify, request
 
 import requests
 
@@ -49,7 +50,7 @@ def organize_events(events):
 def home():
     return render_template('mainpage.html')
 
-@app.route('/api/events', methods=['GET'])
+@app.route('/get-events', methods=['GET'])
 def get_all_events():
     music_url=f'{base_url}?classificationName=music&dmaId=235&apikey={key}'
     other_url=f'{base_url}?dmaId=235&apikey={key}'
